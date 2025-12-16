@@ -7,30 +7,24 @@ model = YOLO('yolov8n-obb.pt')
 results = model.train(
     data="DOTAv1.yaml",
     epochs=30,
-
-    # ===== СКОРОСТЬ (ГЛАВНОЕ!) =====
     imgsz=400,  # Увеличиваем до 640 (быстрее конвергенция)
     batch=16,  # Увеличиваем batch для ускорения (если память позволяет)
     device=0,
-    workers=0,  # Windows фикс
+    workers=0,
 
-    # ===== УСКОРЕНИЕ ОБУЧЕНИЯ =====
-    amp=False,  # У вас уже отключено (правильно для 1660 Super)
+    amp=False,
     close_mosaic=0,  # Не отключать мозаику
-    cache=False,  # Кэш замедляет на маленьких датасетах
+    cache=False,
 
-    # ===== ОПТИМИЗАЦИЯ =====
     lr0=0.02,  # Увеличиваем learning rate для ускорения
     lrf=0.01,
     momentum=0.937,
     weight_decay=0.0005,
-    warmup_epochs=2,  # Уменьшаем прогрев
+    warmup_epochs=2,
     warmup_momentum=0.8,
     box=7.5,
     cls=0.5,
     dfl=1.5,
-
-    # ===== АУГМЕНТАЦИЯ (уменьшаем для скорости) =====
     augment=True,
     degrees=5.0,  # Уменьшаем поворот
     translate=0.05,  # Уменьшаем смещение
@@ -42,21 +36,15 @@ results = model.train(
     mosaic=0.5,  # Уменьшаем мозаику
     mixup=0.0,
     copy_paste=0.0,
-
-    # ===== ВАЛИДАЦИЯ (ускоряем) =====
     val=True,
     save=True,
-    save_period=5,  # Сохранять чаще
-    plots=True,  # Графики включить
+    save_period=5,
+    plots=True,
     verbose=True,
-
-    # ===== ПРОЕКТ =====
     project='runs/train',
     name='fast_training',
     exist_ok=True,
     pretrained=True,
-
-    # ===== ЭКСПЕРИМЕНТАЛЬНЫЕ НАСТРОЙКИ ДЛЯ СКОРОСТИ =====
     nbs=64,  # Нормализация batch size
     overlap_mask=True,
     mask_ratio=4,
