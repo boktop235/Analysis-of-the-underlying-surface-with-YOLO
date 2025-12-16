@@ -23,16 +23,14 @@ models_config = {
 }
 
 print("=" * 70)
-print("ПРОВЕРКА КЛАССОВ В 4 МОДЕЛЯХ")
+print("ПРОВЕРКА КЛАССОВ В МОДЕЛЯХ")
 print("=" * 70)
 
 
 def get_model_classes(model_path):
-    """Пытается получить классы модели разными способами"""
     classes = []
 
     try:
-        # Способ 1: Загружаем модель и смотрим атрибуты
         model = YOLO(model_path)
 
         # Пробуем разные пути к атрибутам names
@@ -46,7 +44,6 @@ def get_model_classes(model_path):
         return classes, "из модели"
 
     except Exception as e:
-        # Способ 2: Ищем data.yaml файл
         model_dir = os.path.dirname(os.path.dirname(model_path))  # Поднимаемся на уровень выше weights/
 
         # Ищем yaml файлы
@@ -89,7 +86,7 @@ def get_model_classes(model_path):
 # Проверяем каждую модель
 for key, config in models_config.items():
     print(f"\n{'=' * 50}")
-    print(f"📊 {config['name']} ({key})")
+    print(f" {config['name']} ({key})")
     print(f"{'=' * 50}")
 
     if os.path.exists(config['path']):
@@ -106,7 +103,7 @@ for key, config in models_config.items():
         classes, source = get_model_classes(config['path'])
 
         if classes:
-            print(f"  ✅ Количество классов: {len(classes)} ({source})")
+            print(f"  Количество классов: {len(classes)} ({source})")
             print("  Классы:")
 
             # Отображаем классы
@@ -117,10 +114,8 @@ for key, config in models_config.items():
             if len(classes) > max_classes_to_show:
                 print(f"    ... и еще {len(classes) - max_classes_to_show} классов")
 
-            # Показываем статистику по именам классов
-            print(f"\n  📈 Статистика классов:")
+            print(f"\n  Статистика классов:")
 
-            # Проверяем, есть ли числовые имена классов
             numeric_count = 0
             string_count = 0
             unique_classes = set()
@@ -136,28 +131,25 @@ for key, config in models_config.items():
             print(f"    Числовых классов: {numeric_count}")
             print(f"    Текстовых классов: {string_count}")
 
-            # Если все классы числовые, предлагаем переименовать
             if numeric_count == len(classes) and len(classes) > 1:
                 print(f"\n  💡 Подсказка: Все классы числовые. Можете переименовать их:")
                 print("    Например: {0: 'building', 1: 'road', 2: 'tree', 3: 'water'}")
 
         else:
-            print(f"  ⚠️  Классы {source}")
+            print(f"   Классы {source}")
 
             # Попробуем проанализировать структуру папки
             model_dir = os.path.dirname(os.path.dirname(config['path']))
-            print(f"\n  📁 Структура папки {model_dir}:")
+            print(f"\n  Структура папки {model_dir}:")
 
             if os.path.exists(model_dir):
                 try:
-                    # Показываем важные файлы
                     for root, dirs, files in os.walk(model_dir):
                         level = root.replace(model_dir, '').count(os.sep)
-                        if level <= 2:  # Показываем только до 2 уровней вложенности
+                        if level <= 2:
                             indent = '  ' * level
                             print(f"{indent}{os.path.basename(root)}/")
 
-                            # Показываем только важные файлы
                             important_files = [f for f in files if
                                                f.endswith(('.yaml', '.yml', '.txt', '.json', '.pt', '.pth'))]
                             for file in important_files[:5]:  # Первые 5 файлов
@@ -169,7 +161,7 @@ for key, config in models_config.items():
                     print("    Не удалось прочитать структуру папки")
 
     else:
-        print(f"  ❌ Модель не найдена: {config['path']}")
+        print(f"   Модель не найдена: {config['path']}")
 
         # Показываем что есть в runs/
         print(f"\n  🔍 Поиск доступных моделей в runs/:")
@@ -179,13 +171,12 @@ for key, config in models_config.items():
                 item_path = os.path.join(runs_dir, item)
                 if os.path.isdir(item_path) and 'landcover_yolo_model' in item:
                     print(f"    📁 {item}")
-
                     # Проверяем есть ли weights/best.pt
                     weights_path = os.path.join(item_path, 'weights', 'best.pt')
                     if os.path.exists(weights_path):
-                        print(f"      ✅ best.pt найден")
+                        print(f"       best.pt найден")
                     else:
-                        print(f"      ❌ best.pt отсутствует")
+                        print(f"       best.pt отсутствует")
 
 print(f"\n{'=' * 70}")
 print("ИНСТРУКЦИЯ ПО НАСТРОЙКЕ КЛАССОВ")
@@ -206,41 +197,9 @@ names:
 nc: 6  # количество классов
 """)
 
-print("\n💡 СОВЕТЫ:")
-print("- Если классы числовые (0, 1, 2, 3), вы можете:")
-print("  1. Создать mapping в коде: {0: 'building', 1: 'road', ...}")
-print("  2. Отредактировать data.yaml файл модели")
-print("  3. Использовать как есть (будут показываться числа)")
-
-print("\n📍 ВАШИ МОДЕЛИ:")
+print("\nМОДЕЛИ:")
 print(f"1. Model 2: {models_config['model_2']['path']}")
 print(f"2. Model 4: {models_config['model_4']['path']}")
 print(f"3. Model 14: {models_config['model_14']['path']}")
 print(f"4. Model 15: {models_config['model_15']['path']}")
 print("=" * 70)
-
-# Дополнительно: создаем пример mapping файла
-print("\n📝 ПРИМЕР mapping.py для переименования классов:")
-print("""
-# class_mapping.py
-CLASS_MAPPING = {
-    'model_2': {
-        0: 'class_0',
-    },
-    'model_4': {
-        0: 'class_0',  
-    },
-    'model_14': {
-        0: 'class_0',
-        1: 'class_1',
-        2: 'class_2',
-        3: 'class_3',
-    },
-    'model_15': {
-        0: 'class_0',
-        1: 'class_1', 
-        2: 'class_2',
-        3: 'class_3',
-    }
-}
-""")
